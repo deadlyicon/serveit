@@ -1,5 +1,6 @@
 require 'serveit/version'
-require 'pathname'
+require 'serveit/request'
+
 require 'pry'
 require 'rack'
 require 'rack/request'
@@ -13,17 +14,8 @@ class Serveit
     @app = app
   end
 
-  attr_reader :env, :request
   def call env
-    @env = env
-    @request = Rack::Request.new(@env)
-    request.path
-    logger.info "#{request.request_method} #{request.path}"
-    [200, {'Content-Type' => 'text/plain'}, ['helasdsadsalo world']]
-  end
-
-  def logger
-    @logger = env['logger'] ||= Logger.new(STDOUT)
+    Serveit::Request.new(env).responce
   end
 
 end
