@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'pathname'
+
+# app_root = Pathname Dir.pwd
+gem_root = Pathname File.expand_path('../..', __FILE__)
+# lib = Pathname File.expand_path('../../lib', __FILE__)
+
+ENV['BUNDLE_GEMFILE'] = gem_root.join('Gemfile').to_s
+require 'bundler'
+Bundler.require(:default, :development)
+
+require 'serveit'
+
+
+Serveit.run!
