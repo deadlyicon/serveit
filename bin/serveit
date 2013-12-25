@@ -1,17 +1,12 @@
 #!/usr/bin/env ruby
 
+ENV['RACK_ENV'] ||= 'development'
+ENV['BUNDLE_GEMFILE'] = File.expand_path('../../Gemfile', __FILE__)
 require 'rubygems'
-require 'pathname'
+require 'bundler/setup'
+require 'shotgun'
 
-# app_root = Pathname Dir.pwd
-gem_root = Pathname File.expand_path('../..', __FILE__)
-# lib = Pathname File.expand_path('../../lib', __FILE__)
-
-ENV['BUNDLE_GEMFILE'] = gem_root.join('Gemfile').to_s
-require 'bundler'
-Bundler.require(:default, :development)
-
-require 'serveit'
-
-
-Serveit.run!
+app = Shotgun::Loader.new File.expand_path('../../config.ru', __FILE__)
+# Rack::Server.start(app: app, Port: 3000)
+server = Rack::Handler.get(server) || Rack::Handler.default
+server.run app
