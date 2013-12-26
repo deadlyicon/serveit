@@ -13,18 +13,19 @@ class Serveit::File
     @format = extensions.pop
   end
   attr_reader :path, :processor, :format
+  alias_method :extension, :format
 
   def mime_type
     Rack::Mime.mime_type(".#{format}")
   end
 
-  def controller?
-    format == 'rb'
-  end
+  # def controller?
+  #   format == 'rb'
+  # end
 
-  def template?
-    !controller?
-  end
+  # def template?
+  #   !controller?
+  # end
 
   def read
     @path.read

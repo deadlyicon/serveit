@@ -1,17 +1,30 @@
 require 'mime/types'
+require 'rack/response'
 require 'rack/file'
 require 'tilt'
 
 class Serveit::Controller
 
+
   def initialize request
     @request = request
+    eval_controller_file!
   end
   attr_reader :request
 
-  def inspect
-    %(#<#{self.class} #{request.path.to_s.inspect}>)
+  def locals
+    @locals ||= {}
   end
+
+  def response
+    @response ||= Rack::Response.new
+  end
+
+  def finish
+    response.finish
+  end
+
+
 
   def files
     @files ||= begin
@@ -21,8 +34,13 @@ class Serveit::Controller
     end
   end
 
-  def controller_source_file
-    @controller_source_file ||= files.find(&:controller?)
+  def controller_file
+    @controller_file ||= files.find{|file| file.extension == 'rb' }
+  end
+
+  def eval_controller_file!
+    return unless controller_file
+    instance_eval(controller_file.read, controller_file.path.to_s, 1)
   end
 
   def template
@@ -42,23 +60,24 @@ class Serveit::Controller
     @template
   end
 
+  def execute_controller!
+    Context.new(self, files.find(&:controller?))
+  end
+
   def render
-    p files
-
-    if controller_source_file
-      instance_eval(controller_source_file.read, controller_source_file.to_s, 1)
-    end
-
-    if template
-      request.logger.info "Rendering #{template.path}"
-      return [200, {'Content-Type' => template.mime_type}, [template.render]]
-    end
+    execute_controller!
+    response.finish
 
     # if request.path.local.file?
     #   return Rack::File.new(Serveit.root).call(request.env)
     # end
 
     return [404, {'Content-Type' => 'text/plain'}, ['404 Not found']]
+  end
+
+
+  def inspect
+    %(#<#{self.class}>)
   end
 
 end
