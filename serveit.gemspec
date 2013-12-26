@@ -20,6 +20,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rack'
   spec.add_dependency 'rack-contrib'
+  spec.add_dependency 'mime-types'
+  spec.add_dependency 'rack-accept'
+  spec.add_dependency 'tilt'
   spec.add_dependency 'shotgun'
   spec.add_dependency 'thin'
   spec.add_dependency 'pry'

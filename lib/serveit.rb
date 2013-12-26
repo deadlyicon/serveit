@@ -10,12 +10,21 @@ require 'pp'
 
 class Serveit
 
+  def self.root
+    Dir.pwd
+  end
+
   def initialize app
     @app = app
   end
 
   def call env
-    Serveit::Request.new(env).responce
+    status, headers, body = Serveit::Request.new(env).responce
+    if status == 404
+      @app.call(env)
+    else
+      [status, headers, body]
+    end
   end
 
 end

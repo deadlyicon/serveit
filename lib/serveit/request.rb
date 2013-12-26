@@ -1,7 +1,6 @@
 require 'rack/request'
-require 'serveit/controller'
 require 'serveit/path'
-require 'serveit/file'
+require 'rack/file'
 require 'pathname'
 
 class Serveit::Request < Rack::Request
@@ -14,35 +13,48 @@ class Serveit::Request < Rack::Request
     @path ||= Serveit::Path.new(self, super)
   end
 
-  # def format
-  #   @format = File.extname(path)[1..-1]
-  # end
-
-  def controller
-    @controller ||= Serveit::Controller.new(self)
+  def format
+    @format ||= path.extension
   end
+
+  def accepts
+    @accepts ||= env['rack-accept.request'].media_type.values
+    # @accepts ||= begin
+    #   accepts = []
+    #   accepts << Rack::Mime.mime_type(".#{format}") if format.present?
+    #   accepts + env['rack-accept.request'].media_type.values
+    # end.uniq
+  end
+
+  # def mime_types
+  #   @mime_types ||= begin
+  #     accepts.map do |mime_type|
+  #       MIME::Types[mime_type]
+  #     end.flatten(1)
+  #   end
+  # end
 
   def responce
     logger.info "#{request_method} #{path}"
+
     # logger.info controller.pretty_inspect
     # controller
     # logger.info "format: #{format}"
     # logger.info files.pretty_inspect
     # logger.info pretty_inspect
     # logger.into Serveit::Path.new(path)
-    logger.info path.files.inspect
 
-    if path.files.empty?
-      [404, {'Content-Type' => 'text/plain'}, ['404 Not found']]
-    else
-      [200, {'Content-Type' => 'text/plain'}, ['helasdsadsalo world']]
-    end
+    logger.info path.local.to_s
+
+    controller.render
+  end
+
+  def controller
+    @controller ||= Serveit::Controller.new(self)
   end
 
   def logger
     @logger = self['logger'] ||= Logger.new(STDOUT)
   end
-
-
 
 end

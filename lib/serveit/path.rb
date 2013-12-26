@@ -1,9 +1,13 @@
+require 'serveit/controller'
+require 'serveit/file'
+require 'rack/mime'
+
 class Serveit::Path
 
   def initialize request, path
-    @request, @path = request, path
-    @path = @path+'index' if @path[-1] == '/'
+    @request, @path = request, Pathname(path[1..-1])
   end
+  attr_reader :request
 
   def to_s
     @path.to_s
@@ -11,28 +15,31 @@ class Serveit::Path
   alias_method :to_str, :to_s
 
   def extension
-    @extension ||= File.extname(@path)[1..-1].presence || 'html' # TODO respect accepts header
+    @extension ||= File.basename(to_s).split('.').last
   end
 
   def without_extension
-    @without_extension ||= @path.sub(%r(#{Regexp.escape(File.extname(@path))}\Z), '')
+    @without_extension ||= to_s.sub(%r(#{Regexp.escape(File.extname(to_s))}\Z), '')
   end
 
   def basename
-    @basename or begin
-      @basename = File.basename(without_extension)
-      @basename = @basename + 'index' if @basename[-1] == '/'
-    end
-    @basename
+    @basename ||= File.basename(without_extension)
   end
 
-  def files
-    @request.logger.info "searching for: #{@request.root}#{without_extension}.*"
-    Dir["#{@request.root}#{without_extension}.*"]
+  def local
+    @local ||= request.root.join(@path)
+  end
+
+  def relative
+    path.relative_path_from(request.root)
+  end
+
+  def directory?
+    local.directory?
   end
 
   def inspect
-    %(#<#{self.class} #{@path.inspect}>)
+    %(#<#{self.class} #{to_s.inspect}>)
   end
 
 end
