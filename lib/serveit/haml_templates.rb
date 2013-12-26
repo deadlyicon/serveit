@@ -10,43 +10,36 @@ class Serveit::HamlTemplates
     @root ||= Pathname(@options[:root] || Dir.pwd)
   end
 
-  def path
-    @path ||= begin
-      path = ".#{@env['PATH_INFO']}"
-      path = "#{path}/index" if root.join(path).directory?
-      path = path[0..-2]     if path != './' && path[-1] == "/"
-      path = "#{path}.html"  if File.extname(path) == ""
-      path
+  def call env
+    dup._call env
+  end
+
+  def _call env
+    @env = env
+    # p path
+    return not_found if path =~ /\.haml$/
+    if renderable?
+      body = Tilt.new(path).render
+      [200, {'Content-Type' => 'text/html', 'Content-Length' => body.length.to_s}, [body]]
+    else
+      @app.call(@env)
     end
   end
 
-  def template_file_path
-    @template_file_path ||= root + "#{path}.haml"
+  def path
+    @path ||= root.join(".#{@env['PATH_INFO']}").to_s
   end
 
-  def template_renderable?
-    template_file_path.file? && template_file_path.readable?
+  def renderable?
+    return false if path !~ /\.html$/
+    path << '.haml' if $1.nil?
+    File.file?(path) && File.readable?(path)
   rescue SystemCallError
     false
   end
 
-  def template
-    @template ||= Tilt.new(template_file_path)
-  end
-
-  def render
-    @render ||= template.render
-  end
-
-  def call env
-    @env = env
-    return @app.call(@env) unless template_renderable?
-    response = Rack::Response.new
-    response.status = 200
-    response['Content-Type']   = 'text/html'
-    response['Content-Length'] = render.length
-    response.write render
-    response.finish
+  def not_found
+    [404, {'Content-Type' => 'text/plain'}, []]
   end
 
 end

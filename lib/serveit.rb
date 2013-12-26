@@ -10,10 +10,11 @@ require 'serveit/request'
 
 module Serveit
 
-  autoload :NotFound,      'serveit/not_found'
-  autoload :Static,        'serveit/static'
+  autoload :InferIndex,     'serveit/infer_index'
   autoload :InferExtension, 'serveit/infer_extension'
-  autoload :HamlTemplates, 'serveit/haml_templates'
+  autoload :HamlTemplates,  'serveit/haml_templates'
+  autoload :Static,         'serveit/static'
+  autoload :NotFound,       'serveit/not_found'
 
   # def self.root
   #   Dir.pwd
