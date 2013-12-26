@@ -70,7 +70,7 @@ describe 'all together now' do
   end
 
   describe '/contact/' do
-    it { should eq not_found }
+    it { should eq static_file '/contact/index.html' }
   end
 
   describe '/contact/address' do

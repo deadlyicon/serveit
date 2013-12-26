@@ -8,10 +8,11 @@ class Serveit::InferExtension
     status, headers, body = @app.call(env)
     return [status, headers, body] if status <= 400
     path = env['PATH_INFO']
-    if File.basename(path) != 'index' && File.extname(path) == ""
-    # if File.extname(path) == ""
+    # p  env['PATH_INFO']
+    if File.extname(path) == ""
       extension = 'html' # TODO make this a default mime type based on accepts
-      env['PATH_INFO'] << ".#{extension}"
+      env['PATH_INFO'] += ".#{extension}"
+      # p  env['PATH_INFO']
       status, headers, body = @app.call(env)
     end
     return [status, headers, body]
