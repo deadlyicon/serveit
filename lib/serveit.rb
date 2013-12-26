@@ -12,6 +12,7 @@ module Serveit
 
   autoload :NotFound,      'serveit/not_found'
   autoload :Static,        'serveit/static'
+  autoload :InferExtension, 'serveit/infer_extension'
   autoload :HamlTemplates, 'serveit/haml_templates'
 
   # def self.root

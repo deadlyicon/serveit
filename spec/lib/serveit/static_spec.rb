@@ -30,13 +30,11 @@ describe Serveit::HamlTemplates do
   end
 
   context 'GET /contact' do
-    it "renders /contact.html as a 200" do
-      response = get '/contact'
-      expect( response.status  ).to eq 200
-      expect( response.body    ).to eq "<h1>Contact us at:</h1>\n"
-      expect( response.headers['Content-Type']   ).to eq 'text/html'
-      expect( response.headers['Content-Length'] ).to eq '24'
-      expect( response.headers['Last-Modified']  ).to_not be_nil
+    it "renders a 404" do
+      response = get '/'
+      expect( response.status  ).to eq 404
+      expect( response.body    ).to eq ""
+      expect( response.headers ).to eq("Content-Type"=>"text/plain")
     end
   end
 
