@@ -10,9 +10,21 @@ describe Serveit::HamlTemplates do
     end
   end
 
-  context 'when given a path that matches a files basename and extension' do
-    it "renders the hamle template and returns a 200 ok" do
+  context 'GET /about.html' do
+    it "renders /about.html.haml as a 200" do
       response = get '/about.html'
+      expect( response.status  ).to eq 200
+      expect( response.body    ).to eq "<h1>About page</h1>\n"
+      expect( response.headers ).to eq(
+        'Content-Type'   => 'text/html',
+        'Content-Length' => '20',
+      )
+    end
+  end
+
+  context 'GET /about' do
+      it "renders /about.html.haml as a 200" do
+      response = get '/about'
       expect( response.status  ).to eq 200
       expect( response.body    ).to eq "<h1>About page</h1>\n"
       expect( response.headers ).to eq(

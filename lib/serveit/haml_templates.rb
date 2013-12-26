@@ -10,8 +10,16 @@ class Serveit::HamlTemplates
     @root ||= Pathname(@options[:root] || Dir.pwd)
   end
 
+  def path
+    @path ||= begin
+      path = ".#{@env['PATH_INFO']}"
+      path = "#{path}.html" if File.extname(path) == ""
+      path
+    end
+  end
+
   def template_file_path
-    @template_file_path ||= root + ".#{@env['PATH_INFO']}.haml"
+    @template_file_path ||= root + "#{path}.haml"
   end
 
   def template_renderable?
