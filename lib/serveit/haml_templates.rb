@@ -33,7 +33,7 @@ class Serveit::HamlTemplates
     return @app.call(@env) unless template_renderable?
     response = Rack::Response.new
     response.status = 200
-    response['Content-Type']
+    response['Content-Type']   = 'text/html'
     response['Content-Length'] = render.length
     response.write render
     response.finish
