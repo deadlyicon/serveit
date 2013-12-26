@@ -1,4 +1,8 @@
 require 'serveit'
+require 'pry'
+require 'rack/test'
+
+TEST_APP_ROOT = File.expand_path('../../test/app', __FILE__)
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
@@ -10,4 +14,5 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+  config.include Rack::Test::Methods
 end

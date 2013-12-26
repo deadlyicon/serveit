@@ -11,6 +11,10 @@ If the controller water a different template to be rendered it could pass that i
 
 the authentication module would be programmable to require authentication before whatever paths, configurable with ruby code. when auth is passed, it puts the users in the request env and throws it up the chain
 
+
+
+also each middleware i make can share objects like a Rack::Requset and Rack::Response by ||=ing an object in env['serveit']
+
 ```ruby
   use Rack::CommonLogger, STDERR
   use Rack::ShowExceptions

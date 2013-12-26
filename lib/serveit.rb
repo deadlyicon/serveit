@@ -10,6 +10,9 @@ require 'serveit/request'
 
 module Serveit
 
+  autoload :NotFound, 'serveit/not_found'
+  autoload :HamlTemplates, 'serveit/haml_templates'
+
   # def self.root
   #   Dir.pwd
   # end
