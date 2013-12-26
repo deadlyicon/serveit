@@ -14,8 +14,9 @@ class Serveit
     Dir.pwd
   end
 
-  def initialize app
+  def initialize app, options={}
     @app = app
+    @options = options
   end
 
   def call env
