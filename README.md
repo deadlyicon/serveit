@@ -22,7 +22,8 @@ the authentication module would be programmable to require authentication before
   use Serveit::HamlTemplates
   use Serveit::ErbTemplates
   use Serveit::SassTemplates
-  use Serveit::SprocketsTemplates
+  use Serveit::Sprockets
+  use Serveit::Static
 ```
 
 ## Installation
