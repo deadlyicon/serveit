@@ -12,7 +12,6 @@ class Serveit::Static
   end
 
   def call env
-    # puts "STATIC: #{env['PATH_INFO']}"
     status, headers, body = @file.call(env)
     if status > 400
       @app.call(env)

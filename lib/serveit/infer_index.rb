@@ -8,18 +8,26 @@ class Serveit::InferIndex
     @root ||= Pathname(@options[:root] || Dir.pwd)
   end
 
+  def path_info
+    @path_info ||= @env['PATH_INFO'].dup
+  end
+
+  def append_index!
+    @env['PATH_INFO'] = File.join(path_info, 'index')
+    return @app.call(@env)
+  end
+
+  def directory?
+    File.directory?("#{root}#{path_info}")
+  end
+
   def call env
-    return not_found if File.basename(env['PATH_INFO']) =~ /^index(\.|$)/
-    path_info = env['PATH_INFO'].dup
-    path = "#{root}#{path_info}"
-    env['PATH_INFO'] = File.join(path_info, 'index') if path[-1] == "/"
-    # env['PATH_INFO'] = File.join(env['PATH_INFO'], 'index') if File.directory?(path) || path[-1] == "/"
+    @env = env
+    return not_found if File.basename(path_info) =~ /^index(\.|$)/
+    return append_index! if path_info[-1] == "/"
     status, headers, body = @app.call(env)
-    if status > 400 &&  File.directory?(path)
-      env['PATH_INFO'] = File.join(path_info, 'index')
-      status, headers, body = @app.call(env)
-    end
-    [status, headers, body]
+    return [status, headers, body] if status <= 400 || !directory?
+    return append_index!
   end
 
   def not_found
