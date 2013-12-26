@@ -13,7 +13,9 @@ class Serveit::HamlTemplates
   def path
     @path ||= begin
       path = ".#{@env['PATH_INFO']}"
-      path = "#{path}.html" if File.extname(path) == ""
+      path = "#{path}/index" if root.join(path).directory?
+      path = path[0..-2]     if path != './' && path[-1] == "/"
+      path = "#{path}.html"  if File.extname(path) == ""
       path
     end
   end
