@@ -1,11 +1,12 @@
 require 'tilt'
+require 'rack/mime'
 
 class Serveit::File
 
   # /a/b/c/people.html.haml.erb
   def initialize path
-    @path = Pathname(path)
-    extensions = File.basename(path).split('.')[1..-1]
+    @path = Serveit::Path.new(path)
+    extensions = @path.extensions
     if extensions.size > 1 && @processor = Tilt[extensions.last.downcase]
       extensions.pop.downcase
     end

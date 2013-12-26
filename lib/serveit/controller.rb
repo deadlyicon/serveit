@@ -15,8 +15,8 @@ class Serveit::Controller
 
   def files
     @files ||= begin
-      local_path = request.root.join(request.path.without_extension)
-      files = Dir["#{local_path}/index.*"] + Dir["#{local_path}.*"]
+      local_path = request.root + request.path.without_extension
+      files = Dir[local_path + "index.*"] + Dir["#{local_path}.*"]
       files.map{|path| Serveit::File.new(path) }
     end
   end
@@ -27,7 +27,7 @@ class Serveit::Controller
 
   def template
     return @template if defined? @template
-    if request.format
+    if request.format.present?
       mime_type = Rack::Mime.mime_type(".#{request.format}")
       files.each do |file|
         return @template = file if Rack::Mime.match?(file.mime_type, mime_type)
@@ -43,11 +43,11 @@ class Serveit::Controller
   end
 
   def render
+    p files
+
     if controller_source_file
       instance_eval(controller_source_file.read, controller_source_file.to_s, 1)
     end
-
-    # binding.pry
 
     if template
       request.logger.info "Rendering #{template.path}"

@@ -5,12 +5,14 @@ require 'pathname'
 
 class Serveit::Request < Rack::Request
 
+  autoload :Path, 'serveit/request/path'
+
   def root
-    @root ||= Pathname Dir.pwd
+    @root ||= Serveit::Path.new(Dir.pwd)
   end
 
   def path
-    @path ||= Serveit::Path.new(self, super)
+    @path ||= Path.new(super)
   end
 
   def format
@@ -19,20 +21,7 @@ class Serveit::Request < Rack::Request
 
   def accepts
     @accepts ||= env['rack-accept.request'].media_type.values
-    # @accepts ||= begin
-    #   accepts = []
-    #   accepts << Rack::Mime.mime_type(".#{format}") if format.present?
-    #   accepts + env['rack-accept.request'].media_type.values
-    # end.uniq
   end
-
-  # def mime_types
-  #   @mime_types ||= begin
-  #     accepts.map do |mime_type|
-  #       MIME::Types[mime_type]
-  #     end.flatten(1)
-  #   end
-  # end
 
   def responce
     logger.info "#{request_method} #{path}"
@@ -44,7 +33,7 @@ class Serveit::Request < Rack::Request
     # logger.info pretty_inspect
     # logger.into Serveit::Path.new(path)
 
-    logger.info path.local.to_s
+    # logger.info path.local.to_s
 
     controller.render
   end

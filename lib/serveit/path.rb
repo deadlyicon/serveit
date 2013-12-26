@@ -1,45 +1,26 @@
 require 'serveit/controller'
 require 'serveit/file'
-require 'rack/mime'
 
-class Serveit::Path
+class Serveit::Path < Pathname
 
-  def initialize request, path
-    @request, @path = request, Pathname(path[1..-1])
+  # we ignore absolute paths
+  def + path
+    super path.to_s.sub(/^\//,'')
   end
-  attr_reader :request
+  alias_method :join, :+
 
-  def to_s
-    @path.to_s
-  end
   alias_method :to_str, :to_s
 
   def extension
-    @extension ||= File.basename(to_s).split('.').last
+    @extension ||= extname.sub(/^./,'')
+  end
+
+  def extensions
+    @extensions ||= Array(basename.to_s.split('.')[1..-1])
   end
 
   def without_extension
-    @without_extension ||= to_s.sub(%r(#{Regexp.escape(File.extname(to_s))}\Z), '')
-  end
-
-  def basename
-    @basename ||= File.basename(without_extension)
-  end
-
-  def local
-    @local ||= request.root.join(@path)
-  end
-
-  def relative
-    path.relative_path_from(request.root)
-  end
-
-  def directory?
-    local.directory?
-  end
-
-  def inspect
-    %(#<#{self.class} #{to_s.inspect}>)
+    @without_extension ||= self.class.new to_s.sub(%r(#{Regexp.escape(extname)}\Z), '')
   end
 
 end
